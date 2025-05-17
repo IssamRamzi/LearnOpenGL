@@ -2,14 +2,14 @@
 #include "GLFW/glfw3.h"
 
 
-class VBO
+class EBO
 {
 private:
     GLuint _buffer;
 
 public:
-    VBO(GLfloat* vertices, GLsizeiptr size);
-    ~VBO();
+    EBO(GLuint* indices, GLsizeiptr size);
+    ~EBO();
 
     void bind();
     void unbind();

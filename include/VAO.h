@@ -1,16 +1,15 @@
 #include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include "VBO.h"
 
-
-class VBO
+class VAO
 {
 private:
     GLuint _buffer;
-
 public:
-    VBO(GLfloat* vertices, GLsizeiptr size);
-    ~VBO();
-
+    
+    VAO();
+    ~VAO();
+    void linkVBO(VBO vbo, GLint layout);
     void bind();
     void unbind();
 };

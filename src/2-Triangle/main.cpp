@@ -2,7 +2,7 @@
 #include "GLFW/glfw3.h"
 
 #include <iostream>
-
+#include "../../include/Shader.h"
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -21,6 +21,7 @@ const char *fragmentShaderSource = "#version 330 core\n"
 const int WIDTH = 800, HEIGHT = 600;
 
 void processInput(GLFWwindow *window);
+#if 0
 
 int main()
 {
@@ -159,6 +160,10 @@ int main()
 
     return 0;
 }
+#endif
+
+#include "VAO.h"
+#include "EBO.h"
 
 void processInput(GLFWwindow *window){
     if(glfwGetKey(window, GLFW_KEY_ESCAPE)){
@@ -166,3 +171,71 @@ void processInput(GLFWwindow *window){
     }
 }
 
+
+int main(int argc, char const *argv[])
+{
+    
+    glfwInit();
+
+    // Config
+    glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // Create a window
+    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
+
+    // Checks if it was properly done
+    if(window == NULL){
+        std::cout << "Window initialization failed";
+        glfwTerminate();
+        return 1;
+    }
+
+    glfwMakeContextCurrent(window);
+
+    if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)){
+        std::cout << "GLAD initialization failed";
+        glfwTerminate();
+        return 1;
+    }
+
+    Shader shader("../src/shaders/default.vert", "../src/shaders/default.frag");
+
+    float vertices[] = { 
+        0.5f, 0.5f, 0.0f, // top right 
+        0.5f, -0.5f, 0.0f, // bottom right 
+        -0.5f, -0.5f, 0.0f, // bottom left 
+        -0.5f, 0.5f, 0.0f // top left 
+        }; 
+    unsigned int indices[] = { // note that we start from 0! 
+        0, 1, 3, // first triangle 
+        1, 2, 3 // second triangle 
+    };
+
+    VAO vao;
+    vao.bind();
+
+    VBO vbo(vertices, sizeof(vertices));
+    EBO ebo(indices, sizeof(indices));
+
+    vao.linkVBO(vbo, 0);
+    vbo.unbind();
+    ebo.unbind();
+    vao.unbind();
+
+    while (!glfwWindowShouldClose(window))
+    {
+        glClearColor(0.3, 0.2, 0.4, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        shader.enableShader();
+        vao.bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glfwPollEvents();
+        glfwSwapBuffers(window);
+    }
+    return 0;
+}
