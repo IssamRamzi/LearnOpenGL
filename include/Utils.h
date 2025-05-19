@@ -1,21 +1,23 @@
 #include <iostream>
 #include <fstream>
 #include <ostream>
+#include <sstream>
+
 struct Utils
 {
-    static std::string loadStringFromFile(const char* filePath){
-        FILE *file = fopen(filePath, "r");
-        char c;
-        std::string content;
-        c = fgetc(file);
-        while(c != EOF){
-            content.push_back(c);
-            c = fgetc(file);
+    static std::string loadStringFromFile(const char* filePath) {
+        std::ifstream in(filePath, std::ios::binary);
+        if (in)
+        {
+            std::string contents;
+            in.seekg(0, std::ios::end);
+            contents.resize(in.tellg());
+            in.seekg(0, std::ios::beg);
+            in.read(&contents[0], contents.size());
+            in.close();
+            return(contents);
         }
-        fclose(file);
-        content.push_back('\n');
-        std::cout << content;
-        return content.c_str();
+        throw(errno);
     }
 };
 
